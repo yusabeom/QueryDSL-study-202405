@@ -340,6 +340,41 @@ class MemberRepositoryTest {
         System.out.println("\n\n\n");
     }
 
+    @Test
+    @DisplayName("나이가 평균 나이 이상인 회원을 조회")
+    void subQueryGoe() {
+        // given
+        QMember m2 = new QMember("m2");
+        // when
+        factory.selectFrom(member)
+                .where(member.age.goe(
+                        JPAExpressions
+                                // JPAExpressions는 from절을 제외하고 select와 where절에서 사용이 가능
+                                // JPQL도 마찬가지로 from절 서브쿼리 사용이 불가.
+                                // -> Native SQL을 작성하던지, MyBatis or JdbcTemplate 이용, 따로따로 두 번 조회도 사용.
+                                .select(m2.age.avg())
+                                .from(m2)
+                )).fetch();
+
+
+        // then
+    }
+
+    @Test
+    @DisplayName("동적 sql 테스트")
+    void dynamicQueryTest() {
+        // given
+        String name = null;
+        Integer age = 30;
+        // when
+        List<Member> result = memberRepository.findUser(name, age);
+
+        // then
+        System.out.println("\n\n\n");
+        result.forEach(System.out::println);
+        System.out.println("\n\n\n");
+    }
+
 
 
 }
